@@ -16,11 +16,11 @@ responses = {
     ],
     "sad": [
         "I'm really sorry you're feeling down 💙. Do you want to talk about it?",
-        "It’s okay to feel sad sometimes. Sharing might help — would you like to?",
-        "Remember, tough times don’t last, but strong people do 🌈."
+        "It's okay to feel sad sometimes. Sharing might help — would you like to?",
+        "Remember, tough times don't last, but strong people do 🌈."
     ],
     "happy": [
-        "That’s amazing! 😃 Keep spreading the positivity.",
+        "That's amazing! 😃 Keep spreading the positivity.",
         "Love to hear that! 🎉 What's making you feel so happy?",
         "Happiness looks good on you 🌟."
     ],
@@ -41,7 +41,7 @@ responses = {
     ],
     "default": [
         "I may not fully understand, but I'm here to listen 👂.",
-        "Tell me more about what’s on your mind 💭.",
+        "Tell me more about what's on your mind 💭.",
         "That sounds important. Would you like to share more?"
     ]
 }
@@ -69,20 +69,31 @@ def chatbot_response(user_input):
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# User input
-user_message = st.text_input("You:", "")
+# Display chat history first
+st.subheader("💬 Conversation")
+for sender, msg in st.session_state.messages:
+    if sender == "You":
+        st.markdown(f"**🧑 You:** {msg}")
+    else:
+        st.markdown(f"**🤖 MindPal:** {msg}")
 
-if user_message:
+# User input with form to clear after submission
+with st.form("chat_form", clear_on_submit=True):  # This clears the input after submit
+    user_message = st.text_input("Type your message:", key="user_input")
+    submitted = st.form_submit_button("Send")
+
+if submitted and user_message:
     # Append user message
     st.session_state.messages.append(("You", user_message))
 
     # Generate bot response
     bot_reply = chatbot_response(user_message)
     st.session_state.messages.append(("MindPal", bot_reply))
+    
+    # Rerun to update the chat display immediately
+    st.rerun()
 
-# Display chat history
-for sender, msg in st.session_state.messages:
-    if sender == "You":
-        st.markdown(f"**🧑 {sender}:** {msg}")
-    else:
-        st.markdown(f"**🤖 {sender}:** {msg}")
+# Add a button to clear chat history
+if st.button("Clear Conversation"):
+    st.session_state.messages = []
+    st.rerun()
